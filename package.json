@@ -1,0 +1,19 @@
+{
+  "name": "error-wrapper",
+  "version": "1.0.0",
+  "main": "browser-specific.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.14.1",
+    "happy-dom": "^14.12.3",
+    "jsdom": "^24.1.0",
+    "vitest": "^1.6.0"
+  }
+}

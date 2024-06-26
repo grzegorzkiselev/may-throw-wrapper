@@ -15,7 +15,7 @@
 //       .catch((error) => {
 //         console.error(error.message);
 //       });
-//   }); 
+//   });
 // }
 
 // // Ok, maybe I can abuse promise.resolve(sync) to get rid of this kind of duplicate

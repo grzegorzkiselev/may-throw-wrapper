@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    const expect = (value) => {
+      return {
+        toBe(desiredValue) {
+          value === desiredValue 
+          ? console.log("%c PASSED ", "color: white; background-color: #1A73DC; font-weight: bold")
+          : console.log("%c FAILED ", "color: white; background-color: #B35900; font-weight: bold")
+        }
+      }
+    }
+
+    let result = -1;
+    window.onerror = (message, url, line, col, error) => {
+      result = 1;
+      console.error("WINDOW GLOBAL HANDLER:", error instanceof Error ? error.message : error);
+    };
+
+    setTimeout(() => {
+      // [0, 0, 0].pam((item) => item.title);
+      throw new Error("No way brotha");
+    });
+
+    setTimeout(() => {
+      expect(result).toBe(1);
+    });
+  </script>
+</body>
+</html>

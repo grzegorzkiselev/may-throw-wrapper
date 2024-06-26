@@ -1,5 +1,5 @@
 // export const memo = <T extends (...args: any[]) => any>(
-//   callback: T, 
+//   callback: T,
 //   hashGenerator?: HashGen
 // ): (...args: Parameters<T>) => ReturnType<T> => {
 
@@ -9,7 +9,7 @@ interface Promise<T> {
     T extends (result: R, resolve, reject) => any,
     K extends (result: R, resolve, reject) => any
   >(
-    onFullfilled: T, 
+    onFullfilled: T,
     onRejected: K
   ): Promise<ReturnType<T | K>>
 }

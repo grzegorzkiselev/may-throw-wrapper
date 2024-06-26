@@ -1,11 +1,11 @@
-/** 
+/**
  * 1.
  * Как бы мне было удобнее всего обрабатывать ошибки?
- * Есть какая-то функция, и идеальным решением было бы 
+ * Есть какая-то функция, и идеальным решением было бы
  * просто добавлять какой-то декоратор.
- * 
+ *
  * Проблема только в том, что удобно этим пользоваться
- * получится только внутри класса. Для остальных случаев 
+ * получится только внутри класса. Для остальных случаев
  * это будет работать просто как враппер
  */
 
@@ -31,7 +31,7 @@
 
 // class ToDoApp {
 //   todos: Array<Record<string, string>> = [];
-  
+
 //   @catchError()
 //   async fetchTodos() {
 //     this.todos = await fetch("https://jsonplaceholder.typicode.com/todos");
@@ -43,7 +43,7 @@
 
 /**
  * 2.
- * Поскольку декораторы нельзя использовать в любом 
+ * Поскольку декораторы нельзя использовать в любом
  * месте кода, нужна более простая реализация.
  * - [ ] добавить сохранение пользовательских типов
  */
@@ -54,74 +54,98 @@ function catchError(callback, thisArg = null, doSuppress = true) {
       console.error(error.message);
     } else {
       console.error("RETHROWED");
+      console.error(error.message);
       throw error;
     }
-  }
+  };
 
   return (...args) => {
     let prereturn = undefined;
 
+    /**
+     * Нужен ли мне здесь finally?
+     * Finally нужен для того, чтобы
+     * гарантировать выполнение задачи
+     * при выходе из try-catch.
+     *
+     * Возможно, это было бы полезно для
+     * чего-то, связанного с prereturn.
+     */
     try {
       prereturn = callback.apply(thisArg, args);
     } catch(error) {
       onError(error, doSuppress);
     }
-  
+
     if (prereturn && prereturn.then) {
       console.log("it’s async");
 
       return new Promise((resolve) => {
         prereturn.then(resolve)
-          .catch((error) => onError(error, doSuppress))
-      })
-    } 
+          .catch((error) => onError(error, doSuppress));
+      });
+    }
 
     console.log("it’s sync");
-    return prereturn
-  }
+    return prereturn;
+  };
 }
 
 const add = (a, b) => {
   return a + b;
-}
+};
 
 const roulette = (item) => {
   const youReDead = Math.floor(Math.random() * 6) === 0;
 
   if (youReDead) {
-    throw new Error("Bad luck on item with title " + item.title + " :—(")
+    throw new Error("Bad luck on item with title " + item.title + " :—(");
   }
 
   return item.title;
-}
+};
 
-const fetchTodos = async (url) => {
-  return await fetch(url);
-}
+// const fetchTodos = async (url) => {
+//   return await fetch(url);
+// }
 
 console.log(
   catchError(
     add,
   )(null, 4, 7)
-)
+);
+
+// catchError(
+//   fetchTodos,
+// )("https://jsonplaceholder.typicode.com/todos")
+
+const doFetch = (url, options) => {
+  return catchError(
+    fetch,
+    null,
+    false
+  )(url, options);
+};
+
+const process = require("node:process");
+process.on("uncaughtException", (code) => {
+  console.error("UNHANDLED", code);
+});
 
 // https://jsonplaceholder.typicode.com/todos
+doFetch("https://jsonplaceholder.typicode.com/todos")
+  .then((result) => {
+    return catchError(
+      result.json,
+      result
+    )();
+  })
+  .then((result) => {
+    const mapper = catchError(roulette, null, true);
 
-catchError(
-  fetchTodos,
-)("https://jsonplaceholder.typicode.com/todos")
-.then((result) => {
-  return catchError(
-    result.json,
-    result
-  )()
-})
-.then((result) => {  
-  const mapper = catchError(roulette, null, false);
-
-  console.log(
-    result.map(
-      mapper
-    )
-  )
-})
+    console.log(
+      result.map(
+        mapper
+      )
+    );
+  });
